@@ -67,11 +67,22 @@ variables_reset() {
 	online_config=
 	gpu_mem=
 	console_blank=
+	console_framebuffer_width=
+	console_framebuffer_height=
 	hdmi_type=
 	hdmi_tv_res=
 	hdmi_monitor_res=
+	hdmi_force_hotplug=
+	hdmi_ignore_hotplug=
+	hdmi_disable_overscan=
+	hdmi_overscan_right=
+	hdmi_overscan_left=
+	hdmi_overscan_top=
+	hdmi_overscan_bottom=
+	hdmi_disable_overscan=
 	hdmi_disable_overscan=
 	hdmi_system_only=
+	hdmi_display_rotate=
 	usbroot=
 	usbboot=
 	cmdline=
@@ -157,8 +168,11 @@ variables_set_defaults() {
 	variable_set "ip_ipv6" "1"
 	variable_set "hdmi_tv_res" "1080p"
 	variable_set "hdmi_monitor_res" "1024x768"
+	variable_set "hdmi_force_hotplug" "0"
+	variable_set "hdmi_ignore_hotplug" "0"
 	variable_set "hdmi_disable_overscan" "0"
 	variable_set "hdmi_system_only" "0"
+	variable_set "hdmi_display_rotate" "0"
 	variable_set "usbroot" "0"
 	variable_set "usbboot" "0"
 	variable_set "cmdline" "dwc_otg.lpm_enable=0 console=serial0,115200 console=tty1 elevator=deadline fsck.repair=yes"
@@ -761,7 +775,34 @@ if [ "${hdmi_system_only}" = "0" ]; then
 		fi
 	fi
 	if [ "${hdmi_disable_overscan}" = "1" ]; then
-		if ! config_check "/boot/config.txt" "disable_overscan" "1"; then config_set "/boot/config.txt" "disable_overscan" "1"; preinstall_reboot=1; fi
+		if ! config_check "/boot/config.txt" "disable_overscan" "${hdmi_disable_overscan}"; then config_set "/boot/config.txt" "disable_overscan" "${hdmi_disable_overscan}"; preinstall_reboot=1; fi
+	fi
+	if [ -n "${hdmi_overscan_left}" ]; then
+		if ! config_check "/boot/config.txt" "overscan_left" "${hdmi_overscan_left}"; then config_set "/boot/config.txt" "overscan_left" "${hdmi_overscan_left}"; preinstall_reboot=1; fi
+	fi
+	if [ -n "${hdmi_overscan_right}" ]; then
+		if ! config_check "/boot/config.txt" "overscan_right" "${hdmi_overscan_right}"; then config_set "/boot/config.txt" "overscan_right" "${hdmi_overscan_right}"; preinstall_reboot=1; fi
+	fi
+	if [ -n "${hdmi_overscan_top}" ]; then
+		if ! config_check "/boot/config.txt" "overscan_top" "${hdmi_overscan_top}"; then config_set "/boot/config.txt" "overscan_top" "${hdmi_overscan_top}"; preinstall_reboot=1; fi
+	fi
+	if [ -n "${hdmi_overscan_bottom}" ]; then
+		if ! config_check "/boot/config.txt" "overscan_bottom" "${hdmi_overscan_bottom}"; then config_set "/boot/config.txt" "overscan_bottom" "${hdmi_overscan_bottom}"; preinstall_reboot=1; fi
+	fi
+	if [ "${hdmi_display_rotate}" != "0" ]; then
+		if ! config_check "/boot/config.txt" "display_rotate" "${hdmi_display_rotate}"; then config_set "/boot/config.txt" "display_rotate" "${hdmi_display_rotate}"; preinstall_reboot=1; fi
+	fi
+	if [ -n "${console_framebuffer_width}" ]; then
+		if ! config_check "/boot/config.txt" "framebuffer_width" "${console_framebuffer_width}"; then config_set "/boot/config.txt" "framebuffer_width" "${console_framebuffer_width}"; preinstall_reboot=1; fi
+	fi
+	if [ -n "${console_framebuffer_height}" ]; then
+		if ! config_check "/boot/config.txt" "framebuffer_height" "${console_framebuffer_height}"; then config_set "/boot/config.txt" "framebuffer_height" "${console_framebuffer_height}"; preinstall_reboot=1; fi
+	fi
+	if [ "${hdmi_force_hotplug}" = "1" ]; then
+		if ! config_check "/boot/config.txt" "hdmi_force_hotplug" "${hdmi_force_hotplug}"; then config_set "/boot/config.txt" "hdmi_force_hotplug" "${hdmi_force_hotplug}"; preinstall_reboot=1; fi
+	fi
+	if [ "${hdmi_ignore_hotplug}" = "1" ]; then
+		if ! config_check "/boot/config.txt" "hdmi_ignore_hotplug" "${hdmi_ignore_hotplug}"; then config_set "/boot/config.txt" "hdmi_ignore_hotplug" "${hdmi_ignore_hotplug}"; preinstall_reboot=1; fi
 	fi
 	echo "OK"
 fi
@@ -810,6 +851,7 @@ sync
 umount /boot || fail
 echo "OK"
 
+# Network
 echo
 echo "Network configuration:"
 echo "  ifname = ${ifname}"
@@ -1393,11 +1435,21 @@ echo "  cmdline = ${cmdline}"
 echo "  drivers_to_load = ${drivers_to_load}"
 echo "  gpu_mem = ${gpu_mem}"
 echo "  console_blank = ${console_blank}"
+echo "  console_framebuffer_width = ${console_framebuffer_width}"
+echo "  console_framebuffer_height = ${console_framebuffer_height}"
 echo "  hdmi_type = ${hdmi_type}"
 echo "  hdmi_tv_res = ${hdmi_tv_res}"
 echo "  hdmi_monitor_res = ${hdmi_monitor_res}"
 echo "  hdmi_disable_overscan = ${hdmi_disable_overscan}"
+echo "  hdmi_overscan_right = ${hdmi_overscan_right}"
+echo "  hdmi_overscan_left = ${hdmi_overscan_left}"
+echo "  hdmi_overscan_top = ${hdmi_overscan_top}"
+echo "  hdmi_overscan_bottom = ${hdmi_overscan_bottom}"
+echo "  hdmi_display_rotate = ${hdmi_display_rotate}"
 echo "  hdmi_system_only = ${hdmi_system_only}"
+echo "  hdmi_force_hotplug = ${hdmi_force_hotplug}"
+echo "  hdmi_ignore_hotplug = ${hdmi_ignore_hotplug}"
+echo "  hdmi_ignore_hotplug = ${hdmi_ignore_hotplug}"
 echo "  usbroot = ${usbroot}"
 echo "  usbboot = ${usbboot}"
 echo "  rootdev = ${rootdev}"
